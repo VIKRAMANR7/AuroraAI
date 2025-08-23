@@ -7,6 +7,7 @@ import Sidebar from "./components/Sidebar";
 import { useAppContext } from "./context/AppContext";
 import Community from "./pages/Community";
 import Credits from "./pages/Credits";
+import Loading from "./pages/Loading";
 import Login from "./pages/Login";
 
 export default function App() {
@@ -14,7 +15,7 @@ export default function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { pathname } = useLocation();
 
-  if (pathname === "loading") return <Loading />;
+  if (pathname === "/loading") return <Loading />;
   return (
     <>
       {!isMenuOpen && (

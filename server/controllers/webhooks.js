@@ -29,20 +29,22 @@ export const stripeWebhooks = async (request, response) => {
         const { transactionId, appId } = session.metadata;
 
         if (appId === "auroraai") {
-          const transaction = await Transaction.findByOne({
+          const transaction = await Transaction.findOne({
             _id: transactionId,
             isPaid: false,
           });
 
-          //Update credits in user account
-          await User.updateOne(
-            { _id: transaction.userId },
-            { $inc: { credits: transaction.credits } }
-          );
+          if (transaction) {
+            //Update credits in user account
+            await User.updateOne(
+              { _id: transaction.userId },
+              { $inc: { credits: transaction.credits } }
+            );
 
-          //Update credit Payment Status
-          transaction.isPaid = true;
-          await transaction.save();
+            //Update credit Payment Status
+            transaction.isPaid = true;
+            await transaction.save();
+          }
         } else {
           return response.json({
             received: true,

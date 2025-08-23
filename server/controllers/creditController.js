@@ -86,7 +86,6 @@ export const purchasePlan = async (req, res) => {
         },
       ],
       mode: "payment",
-
       success_url: `${origin}/loading`,
       cancel_url: `${origin}`,
       metadata: {
