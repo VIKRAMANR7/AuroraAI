@@ -1,12 +1,55 @@
 import moment from "moment";
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { assets } from "../assets/assets";
 import { useAppContext } from "../context/AppContext";
 
 export default function Sidebar({ isMenuOpen, setIsMenuOpen }) {
-  const { chats, setSelectedChat, theme, setTheme, user, navigate } =
-    useAppContext();
+  const {
+    chats,
+    setSelectedChat,
+    theme,
+    setTheme,
+    user,
+    navigate,
+    createNewChat,
+    axios,
+    setChats,
+    fetchUsersChats,
+    token,
+    setToken,
+  } = useAppContext();
   const [search, setSearch] = useState("");
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    setToken(null);
+    toast.success("Logged out successfully");
+  };
+
+  const deleteChat = async (e, chatId) => {
+    try {
+      e.stopPropagation();
+      const confirm = window.confirm(
+        "Are you sure you want to delete this chat?"
+      );
+      if (!confirm) return;
+      const { data } = await axios.post(
+        "/api/chat/delete",
+        { chatId },
+        {
+          headers: { Authorization: token },
+        }
+      );
+      if (data.success) {
+        setChats((prev) => prev.filter((chat) => chat._id !== chatId));
+        await fetchUsersChats();
+        toast.success(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
   return (
     <div
       className={`flex flex-col h-screen min-w-72 p-5 dark:bg-gradient-to-b from-[#242124]/30 to-[#000000]/30 border-r border-[#80609f]/30 backdrop-blur-3xl transition-all duration-500 max-md:absolute left-0 z-100 ${
@@ -19,7 +62,10 @@ export default function Sidebar({ isMenuOpen, setIsMenuOpen }) {
         className="w-full max-w-48"
       />
       {/* New Chat Button */}
-      <button className="flex justify-center items-center w-full py-2 mt-10 text-white bg-gradient-to-r from-[#a456f7] to-[#3d81f6] text-sm rounded-md cursor-pointer">
+      <button
+        onClick={createNewChat}
+        className="flex justify-center items-center w-full py-2 mt-10 text-white bg-gradient-to-r from-[#a456f7] to-[#3d81f6] text-sm rounded-md cursor-pointer"
+      >
         <span className="mr-2 text-xl">+</span> New Chat
       </button>
       {/* Search Conversations */}
@@ -67,6 +113,11 @@ export default function Sidebar({ isMenuOpen, setIsMenuOpen }) {
                 src={assets.bin_icon}
                 className="hidden group-hover:block w-4 cursor-pointer not-dark:invert"
                 alt=""
+                onClick={(e) =>
+                  toast.promise(deleteChat(e, chat._id), {
+                    loading: "deleting...",
+                  })
+                }
               />
             </div>
           ))}
@@ -77,7 +128,7 @@ export default function Sidebar({ isMenuOpen, setIsMenuOpen }) {
           navigate("/community");
           setIsMenuOpen(false);
         }}
-        className="flex items-center gap-2 p-3 mt-4 border border-gray-300 dark:border-white/15 rounded-md cursor-pointer hover:scale-103 transition-all"
+        className="flex items-center gap-2 p-3 mt-4 border border-gray-300 dark:border-white/15 rounded-md cursor-pointer hover:scale-103 transition-transform"
       >
         <img
           src={assets.gallery_icon}
@@ -85,7 +136,7 @@ export default function Sidebar({ isMenuOpen, setIsMenuOpen }) {
           alt=""
         />
         <div className="flex flex-col text-sm">
-          <p>Community Images</p>
+          <p className="text-gray-800 dark:text-white">Community Images</p>
         </div>
       </div>
       {/* Credit Purchases Option */}
@@ -94,11 +145,13 @@ export default function Sidebar({ isMenuOpen, setIsMenuOpen }) {
           navigate("/credits");
           setIsMenuOpen(false);
         }}
-        className="flex items-center gap-2 p-3 mt-4 border border-gray-300 dark:border-white/15 rounded-md cursor-pointer hover:scale-103 transition-all"
+        className="flex items-center gap-2 p-3 mt-4 border border-gray-300 dark:border-white/15 rounded-md cursor-pointer hover:scale-103 transition-transform"
       >
         <img src={assets.diamond_icon} className="w-4.5 dark:invert" alt="" />
         <div className="flex flex-col text-sm">
-          <p>Credits: {user?.credits}</p>
+          <p className="text-gray-800 dark:text-white">
+            Credits: {user?.credits}
+          </p>
           <p className="text-xs text-gray-400">
             Purchase credits to use AuroraAI{" "}
           </p>
@@ -106,13 +159,10 @@ export default function Sidebar({ isMenuOpen, setIsMenuOpen }) {
       </div>
 
       {/* Dark Mode Toggle */}
-      <div
-        onClick={() => navigate("/credits")}
-        className="flex items-center justify-between gap-2 p-3 mt-4 border border-gray-300 dark:border-white/15 rounded-md"
-      >
-        <div className="flex flex-col text-sm">
+      <div className="flex items-center justify-between gap-2 p-3 mt-4 border border-gray-300 dark:border-white/15 rounded-md">
+        <div className="flex items-center gap-2 text-sm">
           <img src={assets.theme_icon} className="w-4 not-dark:invert" alt="" />
-          <p>Dark Mode</p>
+          <p className="text-gray-800 dark:text-white">Dark Mode</p>
         </div>
         <label className="relative inline-flex cursor-pointer">
           <input
@@ -136,6 +186,7 @@ export default function Sidebar({ isMenuOpen, setIsMenuOpen }) {
         </p>
         {user && (
           <img
+            onClick={logout}
             src={assets.logout_icon}
             className="h-5 cursor-pointer hidden not-dark:invert group-hover:block"
             alt=""
