@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none">
+  <defs>
+    <linearGradient id="logoGradient" x1="0" y1="0" x2="48" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#a456f7"/>
+      <stop offset="1" stop-color="#3d81f6"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Rounded square with gradient -->
+  <rect x="0" y="0" width="48" height="48" rx="12" fill="url(#logoGradient)"/>
+
+  <!-- Neural node symbol -->
+  <line x1="24" y1="13" x2="24" y2="35" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <line x1="13" y1="24" x2="35" y2="24" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="24" cy="13" r="3" fill="white"/>
+  <circle cx="24" cy="35" r="3" fill="white"/>
+  <circle cx="13" cy="24" r="3" fill="white"/>
+  <circle cx="35" cy="24" r="3" fill="white"/>
+</svg>
