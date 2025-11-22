@@ -13,17 +13,17 @@ All screenshots are stored in:
 client/public/screenshots/
 ```
 
-### 🏠 Dashboard
+### 🔐 Login
 
-![Dashboard](client/public/screenshots/dashboard.png)
+![Login](client/public/screenshots/login.png)
 
-### 💬 Chat Interface
+### 🏠 Home Page
 
-![Chat](client/public/screenshots/chat.png)
+![Chat](client/public/screenshots/home.png)
 
 ### 🧠 AI Response (Text)
 
-![Text](client/public/screenshots/text.png)
+![Text](client/public/screenshots/chat.png)
 
 ### 🎨 AI Image Generation
 
@@ -36,6 +36,10 @@ client/public/screenshots/
 ### 💎 Credit Plans
 
 ![Credits](client/public/screenshots/credits.png)
+
+### 🌙 Dark Mode
+
+![Dark Mode](client/public/screenshots/darkmode.png)
 
 ---
 
