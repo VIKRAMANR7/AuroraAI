@@ -1,36 +1,40 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
-export const protect = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const header = req.headers.authorization;
+interface JwtPayload {
+  id: string;
+}
 
-    if (!header) {
-      res.status(401).json({ success: false, message: "No token provided" });
-      return;
-    }
+export const protect = asyncHandler(async (req: Request, _res: Response, next: NextFunction) => {
+  const header = req.headers.authorization;
 
-    const token = header.startsWith("Bearer ") ? header.split(" ")[1] : header;
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { id: string };
-
-    const user = await User.findById(decoded.id).select("-password");
-
-    if (!user) {
-      res.status(401).json({ success: false, message: "User not found" });
-      return;
-    }
-
-    req.user = user;
-
-    next();
-  } catch (error) {
-    if (error instanceof Error && error.name === "TokenExpiredError") {
-      res.status(401).json({ success: false, message: "Token expired. Please log in again." });
-      return;
-    }
-
-    res.status(401).json({ success: false, message: "Invalid or malformed token." });
+  if (!header) {
+    throw new Error("No token provided");
   }
-};
+
+  const token = header.startsWith("Bearer ") ? header.split(" ")[1] : header;
+
+  let decoded: JwtPayload;
+
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+  } catch {
+    throw new Error("Invalid or expired token.");
+  }
+
+  const user = await User.findById(decoded.id).select("-password");
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  req.user = {
+    _id: user._id.toString(),
+    name: user.name,
+    email: user.email,
+    credits: user.credits,
+  };
+
+  next();
+});

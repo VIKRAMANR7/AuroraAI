@@ -1,43 +1,32 @@
 import { Request, Response } from "express";
 import Chat from "../models/Chat.js";
-import { sendError } from "../utils/sendError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
-export const createChat = async (req: Request, res: Response) => {
-  try {
-    const user = req.user!;
-    await Chat.create({
-      userId: user._id,
-      userName: user.name,
-      name: "New Chat",
-      messages: [],
-    });
+export const createChat = asyncHandler(async (req: Request, res: Response) => {
+  const user = req.user!;
 
-    res.json({ success: true, message: "Chat created successfully" });
-  } catch (error) {
-    sendError(res, error);
-  }
-};
+  await Chat.create({
+    userId: user._id,
+    userName: user.name,
+    name: "New Chat",
+    messages: [],
+  });
 
-export const getChats = async (req: Request, res: Response) => {
-  try {
-    const user = req.user!;
-    const chats = await Chat.find({ userId: user._id }).sort({ updatedAt: -1 });
+  res.json({ success: true, message: "Chat created successfully" });
+});
 
-    res.json({ success: true, chats });
-  } catch (error) {
-    sendError(res, error);
-  }
-};
+export const getChats = asyncHandler(async (req: Request, res: Response) => {
+  const user = req.user!;
+  const chats = await Chat.find({ userId: user._id }).sort({ updatedAt: -1 });
 
-export const deleteChat = async (req: Request, res: Response) => {
-  try {
-    const user = req.user!;
-    const { chatId } = req.body;
+  res.json({ success: true, chats });
+});
 
-    await Chat.deleteOne({ userId: user._id, _id: chatId });
+export const deleteChat = asyncHandler(async (req: Request, res: Response) => {
+  const user = req.user!;
+  const { chatId } = req.body;
 
-    res.json({ success: true, message: "Chat deleted successfully" });
-  } catch (error) {
-    sendError(res, error);
-  }
-};
+  await Chat.deleteOne({ userId: user._id, _id: chatId });
+
+  res.json({ success: true, message: "Chat deleted successfully" });
+});
