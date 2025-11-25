@@ -1,5 +1,5 @@
 const requiredEnvs = [
-  "MONGO_URI",
+  "MONGODB_URI",
   "JWT_SECRET",
   "STRIPE_SECRET_KEY",
   "STRIPE_WEBHOOK_SECRET",
