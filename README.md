@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![AuroraAI Banner](public/screenshots/home.png)
+![AuroraAI Banner](client/public/screenshots/home.png)
 
 **A full-stack AI-powered platform for intelligent conversations and image generation**
 
@@ -500,32 +500,32 @@ VITE_BASE_URL=http://localhost:5000
 
 ### Home Page
 
-![Home](public/screenshots/home.png)
+![Home](client/public/screenshots/home.png)
 _Landing page with AI chat interface_
 
 ### Chat Interface
 
-![Chat](public/screenshots/chat.png)
+![Chat](client/public/screenshots/chat.png)
 _Real-time AI conversation with syntax highlighting_
 
 ### Dark Mode
 
-![Dark Mode](public/screenshots/darkmode.png)
+![Dark Mode](client/public/screenshots/darkmode.png)
 _Elegant dark theme for comfortable viewing_
 
 ### Credit Plans
 
-![Credits](public/screenshots/credits.png)
+![Credits](client/public/screenshots/credits.png)
 _Flexible credit purchasing options_
 
 ### Community Gallery
 
-![Community](public/screenshots/community.png)
+![Community](client/public/screenshots/community.png)
 _User-generated AI images showcase_
 
 ### Login Page
 
-![Login](public/screenshots/login.png)
+![Login](client/public/screenshots/login.png)
 _Secure authentication interface_
 
 ---
