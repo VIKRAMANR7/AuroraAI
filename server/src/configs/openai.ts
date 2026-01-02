@@ -6,7 +6,7 @@ if (!apiKey) {
   throw new Error("Missing GEMINI_API_KEY environment variable");
 }
 
-export const openai = new OpenAI({
+const openai = new OpenAI({
   apiKey,
   baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
 });

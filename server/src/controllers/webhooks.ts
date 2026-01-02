@@ -1,11 +1,11 @@
-import Stripe from "stripe";
 import { Request, Response } from "express";
+import Stripe from "stripe";
 import Transaction from "../models/Transaction.js";
 import User from "../models/User.js";
 
-export const stripeWebhooks = async (req: Request, res: Response) => {
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
+export const stripeWebhooks = async (req: Request, res: Response) => {
   const signature = req.headers["stripe-signature"] as string;
 
   let event: Stripe.Event;
@@ -17,43 +17,39 @@ export const stripeWebhooks = async (req: Request, res: Response) => {
     return res.status(400).send(`Webhook Error: ${message}`);
   }
 
+  if (event.type !== "payment_intent.succeeded") {
+    return res.json({ received: true });
+  }
+
   try {
-    if (event.type === "payment_intent.succeeded") {
-      const paymentIntent = event.data.object as Stripe.PaymentIntent;
+    const paymentIntent = event.data.object as Stripe.PaymentIntent;
 
-      const sessions = await stripe.checkout.sessions.list({
-        payment_intent: paymentIntent.id,
-      });
+    const sessions = await stripe.checkout.sessions.list({
+      payment_intent: paymentIntent.id,
+    });
 
-      const session = sessions.data[0];
+    const session = sessions.data[0];
 
-      if (!session?.metadata) {
-        return res.json({ received: true });
-      }
+    if (!session?.metadata) {
+      return res.json({ received: true });
+    }
 
-      const metadata = session.metadata as Record<string, string>;
+    const transactionId = session.metadata.transactionId;
+    const appId = session.metadata.appId;
 
-      const transactionId = metadata.transactionId;
-      const appId = metadata.appId;
+    if (appId !== "auroraai") {
+      return res.json({ received: true });
+    }
 
-      if (appId !== "auroraai") {
-        return res.json({ received: true });
-      }
+    const transaction = await Transaction.findOne({
+      _id: transactionId,
+      isPaid: false,
+    });
 
-      const transaction = await Transaction.findOne({
-        _id: transactionId,
-        isPaid: false,
-      });
-
-      if (transaction) {
-        await User.updateOne(
-          { _id: transaction.userId },
-          { $inc: { credits: transaction.credits } }
-        );
-
-        transaction.isPaid = true;
-        await transaction.save();
-      }
+    if (transaction) {
+      await User.updateOne({ _id: transaction.userId }, { $inc: { credits: transaction.credits } });
+      transaction.isPaid = true;
+      await transaction.save();
     }
 
     return res.json({ received: true });

@@ -13,7 +13,10 @@ export const registerUser = asyncHandler(async (req: Request, res: Response) => 
   const { name, email, password } = req.body;
 
   const existing = await User.findOne({ email });
-  if (existing) throw new Error("User already exists");
+
+  if (existing) {
+    throw new Error("User already exists");
+  }
 
   const user = await User.create({ name, email, password });
   const token = generateToken(user._id.toString());
@@ -25,12 +28,19 @@ export const loginUser = asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   const user = await User.findOne({ email });
-  if (!user) throw new Error("Invalid credentials");
+
+  if (!user) {
+    throw new Error("Invalid credentials");
+  }
 
   const match = await bcrypt.compare(password, user.password);
-  if (!match) throw new Error("Invalid credentials");
+
+  if (!match) {
+    throw new Error("Invalid credentials");
+  }
 
   const token = generateToken(user._id.toString());
+
   res.json({ success: true, token });
 });
 

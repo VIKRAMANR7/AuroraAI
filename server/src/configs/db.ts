@@ -1,26 +1,19 @@
 import mongoose from "mongoose";
 
-export const connectDB = async () => {
-  try {
-    mongoose.connection.on("connected", () => {
-      console.log("Database connected successfully");
-    });
+export async function connectDB(): Promise<void> {
+  mongoose.connection.on("connected", () => {
+    console.log("Database connected");
+  });
 
-    mongoose.connection.on("error", (err: Error) => {
-      console.error("❌ MongoDB connection error:", err.message);
-    });
+  mongoose.connection.on("error", (err: Error) => {
+    console.error("MongoDB connection error:", err.message);
+  });
 
-    const mongoURI = process.env.MONGODB_URI;
-    if (!mongoURI) {
-      throw new Error("MONGODB_URI is not defined in environment variables");
-    }
+  const mongoURI = process.env.MONGODB_URI;
 
-    await mongoose.connect(`${mongoURI}/auroraai`);
-  } catch (error) {
-    console.error(
-      "❌ Failed to connect to MongoDB:",
-      error instanceof Error ? error.message : error
-    );
-    throw error;
+  if (!mongoURI) {
+    throw new Error("MONGODB_URI is not defined");
   }
-};
+
+  await mongoose.connect(`${mongoURI}/auroraai`);
+}

@@ -6,7 +6,6 @@ import Chat from "../models/Chat.js";
 import User from "../models/User.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
-// Text Message
 export const textMessageController = asyncHandler(async (req: Request, res: Response) => {
   const user = req.user!;
   const { chatId, prompt } = req.body;
@@ -16,9 +15,11 @@ export const textMessageController = asyncHandler(async (req: Request, res: Resp
   }
 
   const chat = await Chat.findOne({ userId: user._id, _id: chatId });
-  if (!chat) throw new Error("Chat not found");
 
-  // Push user message
+  if (!chat) {
+    throw new Error("Chat not found");
+  }
+
   chat.messages.push({
     role: "user",
     content: prompt,
@@ -26,7 +27,6 @@ export const textMessageController = asyncHandler(async (req: Request, res: Resp
     isImage: false,
   });
 
-  // AI text response
   const { choices } = await openai.chat.completions.create({
     model: "gemini-2.0-flash",
     messages: [{ role: "user", content: prompt }],
@@ -46,7 +46,6 @@ export const textMessageController = asyncHandler(async (req: Request, res: Resp
   res.json({ success: true, reply });
 });
 
-// IMAGE MESSAGE
 export const imageMessageController = asyncHandler(async (req: Request, res: Response) => {
   const user = req.user!;
   const { prompt, chatId, isPublished } = req.body;
@@ -56,9 +55,11 @@ export const imageMessageController = asyncHandler(async (req: Request, res: Res
   }
 
   const chat = await Chat.findOne({ userId: user._id, _id: chatId });
-  if (!chat) throw new Error("Chat not found");
 
-  // Add user message
+  if (!chat) {
+    throw new Error("Chat not found");
+  }
+
   chat.messages.push({
     role: "user",
     content: prompt,
@@ -66,12 +67,10 @@ export const imageMessageController = asyncHandler(async (req: Request, res: Res
     isImage: false,
   });
 
-  // Generate image via ImageKit URL pattern
   const encodedPrompt = encodeURIComponent(prompt);
+  const imageKitUrl = process.env.IMAGEKIT_URL_ENDPOINT;
 
-  const generatedImageUrl = `${
-    process.env.IMAGEKIT_URL_ENDPOINT
-  }/ik-genimg-prompt-${encodedPrompt}/quickgpt/${Date.now()}.png?tr=w-800,h-800`;
+  const generatedImageUrl = `${imageKitUrl}/ik-genimg-prompt-${encodedPrompt}/quickgpt/${Date.now()}.png?tr=w-800,h-800`;
 
   const aiImageResponse = await axios.get(generatedImageUrl, {
     responseType: "arraybuffer",
@@ -81,7 +80,6 @@ export const imageMessageController = asyncHandler(async (req: Request, res: Res
     "base64"
   )}`;
 
-  // Upload to ImageKit
   const upload = await imageKit.upload({
     file: base64Image,
     fileName: `${Date.now()}.png`,

@@ -3,7 +3,15 @@ import Stripe from "stripe";
 import Transaction from "../models/Transaction.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
-const plans = [
+interface Plan {
+  _id: string;
+  name: string;
+  price: number;
+  credits: number;
+  features: string[];
+}
+
+const plans: Plan[] = [
   {
     _id: "basic",
     name: "Basic",
@@ -44,18 +52,21 @@ const plans = [
   },
 ];
 
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+
 export const getPlans = asyncHandler(async (_req: Request, res: Response) => {
   res.json({ success: true, plans });
 });
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export const purchasePlan = asyncHandler(async (req: Request, res: Response) => {
   const user = req.user!;
   const { planId } = req.body;
 
   const plan = plans.find((p) => p._id === planId);
-  if (!plan) throw new Error("Invalid Plan");
+
+  if (!plan) {
+    throw new Error("Invalid Plan");
+  }
 
   const transaction = await Transaction.create({
     userId: user._id,

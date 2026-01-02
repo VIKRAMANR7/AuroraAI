@@ -23,29 +23,25 @@ app.use(
   })
 );
 
-// Stripe requires raw body BEFORE json middleware
 app.post("/api/stripe", express.raw({ type: "application/json" }), stripeWebhooks);
 
-// JSON middleware
 app.use(express.json());
 
 app.get("/", (_req: Request, res: Response) => {
   res.send("AuroraAI Server is Live");
 });
 
-// API Routes
 app.use("/api/user", userRouter);
 app.use("/api/chat", chatRouter);
 app.use("/api/message", messageRouter);
 app.use("/api/credit", creditRouter);
 
-// Global Error Handler
 app.use(errorHandler);
 
 const PORT = Number(process.env.PORT) || 8000;
 
 app.listen(PORT, () => {
-  console.log(`🚀 AuroraAI Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
 
 export default app;

@@ -16,15 +16,10 @@ export const protect = asyncHandler(async (req: Request, _res: Response, next: N
 
   const token = header.startsWith("Bearer ") ? header.split(" ")[1] : header;
 
-  let decoded: JwtPayload;
-
-  try {
-    decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
-  } catch {
-    throw new Error("Invalid or expired token.");
-  }
+  const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
 
   const user = await User.findById(decoded.id).select("-password");
+
   if (!user) {
     throw new Error("User not found");
   }
