@@ -3,9 +3,13 @@ import Prism from "prismjs";
 import { useEffect } from "react";
 import Markdown from "react-markdown";
 import { assets } from "../assets/assets";
-import { MessageType } from "../types/message";
+import type { MessageType } from "../types/message";
 
-export default function Message({ message }: { message: MessageType }) {
+interface MessageProps {
+  message: MessageType;
+}
+
+export default function Message({ message }: MessageProps) {
   useEffect(() => {
     Prism.highlightAll();
   }, [message.content]);

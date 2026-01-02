@@ -3,7 +3,6 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { assets } from "../assets/assets";
 import { useAppContext } from "../context/AppContextValue";
-import type { ChatType } from "../types/chat";
 
 interface SidebarProps {
   isMenuOpen: boolean;
@@ -58,7 +57,7 @@ export default function Sidebar({ isMenuOpen, setIsMenuOpen }: SidebarProps) {
     }
   };
 
-  const filteredChats = chats.filter((chat: ChatType) => {
+  const filteredChats = chats.filter((chat) => {
     const firstMessage = chat.messages[0]?.content?.toLowerCase();
     const s = search.toLowerCase();
 
@@ -67,7 +66,7 @@ export default function Sidebar({ isMenuOpen, setIsMenuOpen }: SidebarProps) {
 
   return (
     <div
-      className={`flex flex-col h-screen min-w-72 p-5 dark:bg-gradient-to-b from-[#242124]/30 to-[#000000]/30 border-r border-[#80609f]/30 backdrop-blur-3xl transition-all duration-500 max-md:absolute left-0 z-100 ${
+      className={`flex flex-col h-screen min-w-72 p-5 dark:bg-linear-to-b from-[#242124]/30 to-[#000000]/30 border-r border-[#80609f]/30 backdrop-blur-3xl transition-all duration-500 max-md:absolute left-0 z-100 ${
         !isMenuOpen && "max-md:-translate-x-full"
       }`}
     >
@@ -77,15 +76,13 @@ export default function Sidebar({ isMenuOpen, setIsMenuOpen }: SidebarProps) {
         className="w-full max-w-48"
       />
 
-      {/* New Chat Button */}
       <button
         onClick={createNewChat}
-        className="flex justify-center items-center w-full py-2 mt-10 text-white bg-gradient-to-r from-[#a456f7] to-[#3d81f6] text-sm rounded-md cursor-pointer"
+        className="flex justify-center items-center w-full py-2 mt-10 text-white bg-linear-to-r from-[#a456f7] to-[#3d81f6] text-sm rounded-md cursor-pointer"
       >
         <span className="mr-2 text-xl">+</span> New Chat
       </button>
 
-      {/* Search */}
       <div className="flex items-center gap-2 p-3 mt-4 border border-gray-400 dark:border-white/20 rounded-md">
         <input
           onChange={(e) => setSearch(e.target.value)}
@@ -96,7 +93,6 @@ export default function Sidebar({ isMenuOpen, setIsMenuOpen }: SidebarProps) {
         />
       </div>
 
-      {/* Recent Chats */}
       {chats.length > 0 && <p className="mt-4 text-sm">Recent Chats</p>}
 
       <div className="flex-1 overflow-y-scroll mt-3 text-sm space-y-3">
@@ -134,7 +130,6 @@ export default function Sidebar({ isMenuOpen, setIsMenuOpen }: SidebarProps) {
         ))}
       </div>
 
-      {/* Community Images */}
       <div
         onClick={() => {
           navigate("/community");
@@ -148,7 +143,6 @@ export default function Sidebar({ isMenuOpen, setIsMenuOpen }: SidebarProps) {
         </div>
       </div>
 
-      {/* Cred­it Page */}
       <div
         onClick={() => {
           navigate("/credits");
@@ -163,7 +157,6 @@ export default function Sidebar({ isMenuOpen, setIsMenuOpen }: SidebarProps) {
         </div>
       </div>
 
-      {/* Dark Mode Toggle */}
       <div className="flex items-center justify-between gap-2 p-3 mt-4 border border-gray-300 dark:border-white/15 rounded-md">
         <div className="flex items-center gap-2 text-sm">
           <img src={assets.theme_icon} className="w-4 not-dark:invert" alt="" />
@@ -183,7 +176,6 @@ export default function Sidebar({ isMenuOpen, setIsMenuOpen }: SidebarProps) {
         </label>
       </div>
 
-      {/* User Account */}
       <div
         onClick={() => navigate("/community")}
         className="flex items-center gap-3 p-3 mt-4 border border-gray-300 dark:border-white/15 rounded-md cursor-pointer group"

@@ -1,20 +1,20 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import toast from "react-hot-toast";
 import Loading from "./Loading";
 import { useAppContext } from "../context/AppContextValue";
 
-interface CommunityImage {
+interface CommunityImageProps {
   imageUrl: string;
   userName: string;
 }
 
 export default function Community() {
-  const [images, setImages] = useState<CommunityImage[]>([]);
+  const [images, setImages] = useState<CommunityImageProps[]>([]);
   const [loading, setLoading] = useState(true);
 
   const { axios } = useAppContext();
 
-  const fetchImages = async () => {
+  const fetchImages = useCallback(async () => {
     try {
       const { data } = await axios.get("/api/user/published-images");
 
@@ -29,12 +29,11 @@ export default function Community() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [axios]);
 
   useEffect(() => {
     fetchImages();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchImages]);
 
   if (loading) return <Loading />;
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
@@ -21,7 +21,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
   const [loadingUser, setLoadingUser] = useState(true);
 
-  const fetchUser = async () => {
+  const fetchUser = useCallback(async () => {
     try {
       const { data } = await api.get("/api/user/data");
       if (data.success) setUser(data.user);
@@ -31,13 +31,30 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     } finally {
       setLoadingUser(false);
     }
-  };
+  }, []);
 
-  const createNewChat = async (): Promise<void> => {
+  const fetchUsersChats = useCallback(async () => {
+    try {
+      const { data } = await api.get("/api/chat/list");
+      if (data.success) {
+        setChats(data.chats);
+        if (data.chats.length === 0) {
+          navigate("/");
+          await api.post("/api/chat/create");
+          const { data: newData } = await api.get("/api/chat/list");
+          if (newData.success) setChats(newData.chats);
+        }
+      } else toast.error(data.message);
+    } catch (err) {
+      handleError(err);
+    }
+  }, [navigate]);
+
+  const createNewChat = useCallback(async () => {
     try {
       if (!user) {
         toast("Login to create a new chat");
-        return Promise.resolve();
+        return;
       }
       navigate("/");
 
@@ -46,19 +63,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (err) {
       handleError(err);
     }
-  };
-
-  const fetchUsersChats = async () => {
-    try {
-      const { data } = await api.get("/api/chat/list");
-      if (data.success) {
-        setChats(data.chats);
-        if (data.chats.length === 0) await createNewChat();
-      } else toast.error(data.message);
-    } catch (err) {
-      handleError(err);
-    }
-  };
+  }, [user, navigate, fetchUsersChats]);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
@@ -71,8 +76,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       setChats([]);
       setSelectedChat(null);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [user, fetchUsersChats]);
 
   useEffect(() => {
     if (token) {
@@ -83,7 +87,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       setLoadingUser(false);
       setAuthToken(null);
     }
-  }, [token]);
+  }, [token, fetchUser]);
 
   const value: AppContextType = {
     user,

@@ -3,13 +3,12 @@ import toast from "react-hot-toast";
 import { assets } from "../assets/assets";
 import { useAppContext } from "../context/AppContextValue";
 import Message from "./Message";
-import { ChatMessage } from "../types/chat";
+import type { ChatMessage } from "../types/chat";
 import { handleError } from "../utils/handleError";
 
 export default function ChatBox() {
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  // theme from localStorage
   const theme = localStorage.getItem("theme") || "light";
 
   const { selectedChat, user, token, setUser, axios } = useAppContext();

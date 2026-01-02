@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import toast from "react-hot-toast";
 import { useAppContext } from "../context/AppContextValue";
 import Loading from "./Loading";
-import { CreditPlan } from "../types/plan";
+import type { CreditPlan } from "../types/plan";
 
 export default function Credits() {
   const [plans, setPlans] = useState<CreditPlan[]>([]);
@@ -10,7 +10,7 @@ export default function Credits() {
 
   const { token, axios } = useAppContext();
 
-  const fetchPlans = async () => {
+  const fetchPlans = useCallback(async () => {
     try {
       const { data } = await axios.get("/api/credit/plan", {
         headers: { Authorization: token ?? "" },
@@ -27,7 +27,7 @@ export default function Credits() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [axios, token]);
 
   const purchasePlan = async (planId: string) => {
     try {
@@ -50,8 +50,7 @@ export default function Credits() {
 
   useEffect(() => {
     fetchPlans();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchPlans]);
 
   if (loading) return <Loading />;
 
