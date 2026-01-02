@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import axios from "axios";
 import imageKit from "../configs/imageKit.js";
 import openai from "../configs/openai.js";
@@ -11,13 +11,13 @@ export const textMessageController = asyncHandler(async (req: Request, res: Resp
   const { chatId, prompt } = req.body;
 
   if (user.credits < 1) {
-    throw new Error("You don't have enough credits to use this feature");
+    return res.status(400).json({ success: false, message: "You don't have enough credits" });
   }
 
   const chat = await Chat.findOne({ userId: user._id, _id: chatId });
 
   if (!chat) {
-    throw new Error("Chat not found");
+    return res.status(404).json({ success: false, message: "Chat not found" });
   }
 
   chat.messages.push({
@@ -43,7 +43,7 @@ export const textMessageController = asyncHandler(async (req: Request, res: Resp
   await chat.save();
   await User.updateOne({ _id: user._id }, { $inc: { credits: -1 } });
 
-  res.json({ success: true, reply });
+  return res.json({ success: true, reply });
 });
 
 export const imageMessageController = asyncHandler(async (req: Request, res: Response) => {
@@ -51,13 +51,13 @@ export const imageMessageController = asyncHandler(async (req: Request, res: Res
   const { prompt, chatId, isPublished } = req.body;
 
   if (user.credits < 2) {
-    throw new Error("You don't have enough credits to use this feature");
+    return res.status(400).json({ success: false, message: "You don't have enough credits" });
   }
 
   const chat = await Chat.findOne({ userId: user._id, _id: chatId });
 
   if (!chat) {
-    throw new Error("Chat not found");
+    return res.status(404).json({ success: false, message: "Chat not found" });
   }
 
   chat.messages.push({
@@ -68,9 +68,8 @@ export const imageMessageController = asyncHandler(async (req: Request, res: Res
   });
 
   const encodedPrompt = encodeURIComponent(prompt);
-  const imageKitUrl = process.env.IMAGEKIT_URL_ENDPOINT;
 
-  const generatedImageUrl = `${imageKitUrl}/ik-genimg-prompt-${encodedPrompt}/quickgpt/${Date.now()}.png?tr=w-800,h-800`;
+  const generatedImageUrl = `${process.env.IMAGEKIT_URL_ENDPOINT!}/ik-genimg-prompt-${encodedPrompt}/quickgpt/${Date.now()}.png?tr=w-800,h-800`;
 
   const aiImageResponse = await axios.get(generatedImageUrl, {
     responseType: "arraybuffer",
@@ -99,5 +98,5 @@ export const imageMessageController = asyncHandler(async (req: Request, res: Res
   await chat.save();
   await User.updateOne({ _id: user._id }, { $inc: { credits: -2 } });
 
-  res.json({ success: true, reply });
+  return res.json({ success: true, reply });
 });

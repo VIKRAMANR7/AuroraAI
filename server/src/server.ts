@@ -1,17 +1,18 @@
 import cors from "cors";
 import "dotenv/config";
-import express, { Request, Response } from "express";
-import { connectDB } from "./configs/db.js";
+import express from "express";
+
+import connectDB from "./configs/db.js";
+import { validateEnv } from "./configs/validateEnv.js";
+import { errorHandler } from "./middleware/errorHandler.js";
 import { stripeWebhooks } from "./controllers/webhooks.js";
+
 import chatRouter from "./routes/chatRoutes.js";
 import creditRouter from "./routes/creditRoutes.js";
 import messageRouter from "./routes/messageRoutes.js";
 import userRouter from "./routes/userRoutes.js";
-import { validateEnv } from "./configs/validateEnv.js";
-import { errorHandler } from "./middleware/errorHandler.js";
 
 validateEnv();
-
 await connectDB();
 
 const app = express();
@@ -27,7 +28,7 @@ app.post("/api/stripe", express.raw({ type: "application/json" }), stripeWebhook
 
 app.use(express.json());
 
-app.get("/", (_req: Request, res: Response) => {
+app.get("/", (_req, res) => {
   res.send("AuroraAI Server is Live");
 });
 
@@ -38,7 +39,7 @@ app.use("/api/credit", creditRouter);
 
 app.use(errorHandler);
 
-const PORT = Number(process.env.PORT) || 8000;
+const PORT = process.env.PORT || 8000;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

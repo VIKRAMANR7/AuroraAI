@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import Stripe from "stripe";
 import Transaction from "../models/Transaction.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
@@ -55,7 +55,7 @@ const plans: Plan[] = [
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export const getPlans = asyncHandler(async (_req: Request, res: Response) => {
-  res.json({ success: true, plans });
+  return res.json({ success: true, plans });
 });
 
 export const purchasePlan = asyncHandler(async (req: Request, res: Response) => {
@@ -65,7 +65,7 @@ export const purchasePlan = asyncHandler(async (req: Request, res: Response) => 
   const plan = plans.find((p) => p._id === planId);
 
   if (!plan) {
-    throw new Error("Invalid Plan");
+    return res.status(400).json({ success: false, message: "Invalid Plan" });
   }
 
   const transaction = await Transaction.create({
@@ -76,7 +76,7 @@ export const purchasePlan = asyncHandler(async (req: Request, res: Response) => 
     isPaid: false,
   });
 
-  const origin = req.headers.origin || "";
+  const origin = req.headers.origin ?? "";
 
   const session = await stripe.checkout.sessions.create({
     line_items: [
@@ -99,5 +99,5 @@ export const purchasePlan = asyncHandler(async (req: Request, res: Response) => 
     expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
   });
 
-  res.json({ success: true, url: session.url });
+  return res.json({ success: true, url: session.url });
 });
