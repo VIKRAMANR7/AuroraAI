@@ -1,5 +1,6 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+
 import { useAppContext } from "../context/AppContextValue";
 import Loading from "./Loading";
 import type { CreditPlan } from "../types/plan";
@@ -10,26 +11,30 @@ export default function Credits() {
 
   const { token, axios } = useAppContext();
 
-  const fetchPlans = useCallback(async () => {
-    try {
-      const { data } = await axios.get("/api/credit/plan", {
-        headers: { Authorization: token ?? "" },
-      });
+  useEffect(() => {
+    async function fetchPlans() {
+      try {
+        const { data } = await axios.get("/api/credit/plan", {
+          headers: { Authorization: token ?? "" },
+        });
 
-      if (data.success) {
-        setPlans(data.plans);
-      } else {
-        toast.error(data.message || "Failed to fetch plans");
+        if (data.success) {
+          setPlans(data.plans);
+        } else {
+          toast.error(data.message || "Failed to fetch plans");
+        }
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : "Failed to fetch plans";
+        toast.error(msg);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Failed to fetch plans";
-      toast.error(msg);
-    } finally {
-      setLoading(false);
     }
+
+    fetchPlans();
   }, [axios, token]);
 
-  const purchasePlan = async (planId: string) => {
+  async function purchasePlan(planId: string) {
     try {
       const { data } = await axios.post(
         "/api/credit/purchase",
@@ -46,11 +51,7 @@ export default function Credits() {
       const msg = err instanceof Error ? err.message : "Failed to purchase plan";
       toast.error(msg);
     }
-  };
-
-  useEffect(() => {
-    fetchPlans();
-  }, [fetchPlans]);
+  }
 
   if (loading) return <Loading />;
 
