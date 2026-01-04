@@ -3,15 +3,7 @@ import Stripe from "stripe";
 import Transaction from "../models/Transaction.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
-interface Plan {
-  _id: string;
-  name: string;
-  price: number;
-  credits: number;
-  features: string[];
-}
-
-const plans: Plan[] = [
+const plans = [
   {
     _id: "basic",
     name: "Basic",

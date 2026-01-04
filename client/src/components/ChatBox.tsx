@@ -20,7 +20,7 @@ export default function ChatBox() {
   const [mode, setMode] = useState<"text" | "image">("text");
   const [isPublished, setIsPublished] = useState(false);
 
-  const onSubmit = async (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
     if (!user) {
@@ -75,7 +75,7 @@ export default function ChatBox() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   useEffect(() => {
     if (selectedChat) {
@@ -134,7 +134,7 @@ export default function ChatBox() {
       )}
 
       <form
-        onSubmit={onSubmit}
+        onSubmit={handleSubmit}
         className="bg-primary/20 dark:bg-[#583c79]/30 border border-primary dark:border-[#80609f]/30 rounded-full w-full max-w-2xl p-3 pl-4 mx-auto flex gap-4 items-center"
       >
         <select

@@ -11,7 +11,7 @@ export default function Login() {
 
   const { setToken, axios } = useAppContext();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
     const url = state === "login" ? "/api/user/login" : "/api/user/register";
@@ -28,7 +28,7 @@ export default function Login() {
     } catch (err) {
       handleError(err);
     }
-  };
+  }
 
   return (
     <form

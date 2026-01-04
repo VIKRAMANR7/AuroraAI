@@ -27,13 +27,13 @@ export default function Sidebar({ isMenuOpen, setIsMenuOpen }: SidebarProps) {
 
   const [search, setSearch] = useState("");
 
-  const logout = () => {
+  function handleLogout() {
     localStorage.removeItem("token");
     setToken(null);
     toast.success("Logged out successfully");
-  };
+  }
 
-  const deleteChat = async (e: React.MouseEvent, chatId: string) => {
+  async function handleDeleteChat(e: React.MouseEvent, chatId: string) {
     e.stopPropagation();
 
     try {
@@ -55,7 +55,7 @@ export default function Sidebar({ isMenuOpen, setIsMenuOpen }: SidebarProps) {
       const message = error instanceof Error ? error.message : "Failed to delete chat";
       toast.error(message);
     }
-  };
+  }
 
   const filteredChats = chats.filter((chat) => {
     const firstMessage = chat.messages[0]?.content?.toLowerCase();
@@ -121,7 +121,7 @@ export default function Sidebar({ isMenuOpen, setIsMenuOpen }: SidebarProps) {
               className="hidden group-hover:block w-4 cursor-pointer not-dark:invert"
               alt=""
               onClick={(e) =>
-                toast.promise(deleteChat(e, chat._id), {
+                toast.promise(handleDeleteChat(e, chat._id), {
                   loading: "deleting...",
                 })
               }
@@ -188,7 +188,7 @@ export default function Sidebar({ isMenuOpen, setIsMenuOpen }: SidebarProps) {
 
         {user && (
           <img
-            onClick={logout}
+            onClick={handleLogout}
             src={assets.logout_icon}
             className="h-5 cursor-pointer hidden not-dark:invert group-hover:block"
             alt=""
